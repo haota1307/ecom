@@ -19,6 +19,7 @@ import { HashingService } from 'src/shared/services/hashing.service';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { TokenService } from 'src/shared/services/token.service';
 import ms from 'ms';
+import { TypeOfVerificationCode } from 'src/shared/constants/auth.constant';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +34,29 @@ export class AuthService {
 
   async register(body: RegisterBodyType) {
     try {
+      const vevificationCode =
+        await this.authRepository.findUniqueVerificationCode({
+          email: body.email,
+          code: body.code,
+          type: TypeOfVerificationCode.REGISTER,
+        });
+      if (!vevificationCode) {
+        throw new UnprocessableEntityException([
+          {
+            message: 'Mã OTP không hợp lệ',
+            path: 'code',
+          },
+        ]);
+      }
+      if (vevificationCode.expiresAt < new Date()) {
+        throw new UnprocessableEntityException([
+          {
+            message: 'Mã OTP đã hết hạn',
+            path: 'code',
+          },
+        ]);
+      }
+
       const clientRoleId = await this.rolesService.getClientRoleId();
       const hashedPassword = await this.hashingService.hash(body.password);
 
