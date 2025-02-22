@@ -20,6 +20,7 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import { TokenService } from 'src/shared/services/token.service';
 import ms from 'ms';
 import { TypeOfVerificationCode } from 'src/shared/constants/auth.constant';
+import { EmailService } from 'src/shared/services/email.service';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +31,7 @@ export class AuthService {
     private readonly rolesService: RolesService,
     private readonly authRepository: AuthRepository,
     private readonly sharedUserRepository: SharedUserRepository,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(body: RegisterBodyType) {
@@ -40,6 +42,7 @@ export class AuthService {
           code: body.code,
           type: TypeOfVerificationCode.REGISTER,
         });
+
       if (!vevificationCode) {
         throw new UnprocessableEntityException([
           {
@@ -48,6 +51,7 @@ export class AuthService {
           },
         ]);
       }
+
       if (vevificationCode.expiresAt < new Date()) {
         throw new UnprocessableEntityException([
           {
@@ -101,6 +105,19 @@ export class AuthService {
     });
 
     // 3. Gửi mã OTP
+    const { error } = await this.emailService.sendOTP({
+      email: body.email,
+      code,
+    });
+    if (error) {
+      console.log({ error });
+      throw new UnprocessableEntityException([
+        {
+          message: 'Gửi mã OTP thất bại',
+          path: 'code',
+        },
+      ]);
+    }
     return verificationCode;
   }
 
