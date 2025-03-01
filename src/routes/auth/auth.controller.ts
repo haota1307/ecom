@@ -3,18 +3,20 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Ip,
   Post,
 } from '@nestjs/common';
 import { ZodSerializerDto } from 'nestjs-zod';
 import {
-  LoginBodyDTO,
+  LoginResDTO,
+  RefreshTokenBodyDTO,
+  RefreshTokenResDTO,
   RegisterBodyDTO,
   RegisterResDTO,
   SendOTPBodyDTO,
 } from 'src/routes/auth/auth.dto';
 import { LoginBodyType } from 'src/routes/auth/auth.model';
 import { AuthService } from 'src/routes/auth/auth.service';
-import { IP } from 'src/shared/decorators/id.decorator';
 import { UserAgent } from 'src/shared/decorators/user-agent.decorator';
 @Controller('auth')
 export class AuthController {
@@ -22,29 +24,43 @@ export class AuthController {
 
   @Post('register')
   @ZodSerializerDto(RegisterResDTO)
-  async register(@Body() body: RegisterBodyDTO) {
-    return await this.authService.register(body);
+  register(@Body() body: RegisterBodyDTO) {
+    return this.authService.register(body);
   }
 
   @Post('otp')
-  async sendOTP(@Body() body: SendOTPBodyDTO) {
-    return await this.authService.sendOTP(body);
+  sendOTP(@Body() body: SendOTPBodyDTO) {
+    return this.authService.sendOTP(body);
   }
 
   @Post('login')
-  async login(
+  @ZodSerializerDto(LoginResDTO)
+  login(
     @Body() body: LoginBodyType,
     @UserAgent() userAgent: string,
-    @IP() ip: string,
+    @Ip() ip: string,
   ) {
-    return this.authService.login({ ...body, userAgent, ip });
+    return this.authService.login({
+      ...body,
+      userAgent,
+      ip,
+    });
   }
 
-  // @Post('refresh-token')
-  // @HttpCode(HttpStatus.OK)
-  // async refreshToken(@Body() body: any) {
-  //   return this.authService.refreshToken(body.refreshToken);
-  // }
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @ZodSerializerDto(RefreshTokenResDTO)
+  async refreshToken(
+    @Body() body: RefreshTokenBodyDTO,
+    @UserAgent() userAgent: string,
+    @Ip() ip: string,
+  ) {
+    return this.authService.refreshToken({
+      refreshToken: body.refreshToken,
+      userAgent,
+      ip,
+    });
+  }
 
   @Post('logout')
   async logout(@Body() body: any) {
