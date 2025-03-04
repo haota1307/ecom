@@ -28,13 +28,11 @@ import ms from 'ms';
 import { TypeOfVerificationCode } from 'src/shared/constants/auth.constant';
 import { EmailService } from 'src/shared/services/email.service';
 import { AccessTokenPayloadCreate } from 'src/shared/types/jwt.type';
-import { RefreshToken } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly hashingService: HashingService,
-    private readonly prismaService: PrismaService,
     private readonly tokenService: TokenService,
     private readonly rolesService: RolesService,
     private readonly authRepository: AuthRepository,
@@ -136,7 +134,7 @@ export class AuthService {
         },
       ]);
     }
-    return verificationCode;
+    return { message: 'Gửi mã OTP thành công' };
   }
 
   async login(

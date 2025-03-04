@@ -26,12 +26,18 @@ const configSchema = z.object({
   ADMIN_PHONE_NUMBER: z.string(),
   OTP_EXPIRES_IN: z.string(),
   RESEND_API_KEY: z.string(),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_REDIRECT_URI: z.string(),
+  GOOGLE_CLIENT_REDIRECT_URI: z.string(),
 });
 
 const configServer = configSchema.safeParse(process.env);
 
 if (!configServer.success) {
-  console.error('Các giá trị khai báo trong file .env không hợp lệ');
+  console.error(
+    'Các giá trị khai báo trong file .env không hợp lệ',
+  );
   console.error(configServer.error.format());
   process.exit(1);
 }

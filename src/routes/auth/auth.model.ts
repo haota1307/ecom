@@ -1,3 +1,5 @@
+import exp from 'constants';
+import e from 'express';
 import { TypeOfVerificationCode } from 'src/shared/constants/auth.constant';
 import { UserSchema } from 'src/shared/models/shared-user.model';
 import { z } from 'zod';
@@ -40,10 +42,11 @@ export const VerificationCodeSchema = z.object({
   createdAt: z.date(),
 });
 
-export const SendOTPBodySchema = VerificationCodeSchema.pick({
-  email: true,
-  type: true,
-}).strict();
+export const SendOTPBodySchema =
+  VerificationCodeSchema.pick({
+    email: true,
+    type: true,
+  }).strict();
 
 export const LoginBodySchema = UserSchema.pick({
   email: true,
@@ -95,15 +98,42 @@ export const RoleSchema = z.object({
 
 export const LogoutBodySchema = RefreshTokenBodySchema;
 
-export type RegisterBodyType = z.infer<typeof RegisterBodySchema>;
-export type RegisterResType = z.infer<typeof RegisterResSchema>;
-export type VerificationCodeType = z.infer<typeof VerificationCodeSchema>;
-export type SendOTPBodyType = z.infer<typeof SendOTPBodySchema>;
+export const GoogleAuthStateSchema = DeviceSchema.pick({
+  userAgent: true,
+  ip: true,
+});
+
+export const GetAuthorizationUrlResSchema = z.object({
+  url: z.string().url(),
+});
+
+export type RegisterBodyType = z.infer<
+  typeof RegisterBodySchema
+>;
+export type RegisterResType = z.infer<
+  typeof RegisterResSchema
+>;
+export type VerificationCodeType = z.infer<
+  typeof VerificationCodeSchema
+>;
+export type SendOTPBodyType = z.infer<
+  typeof SendOTPBodySchema
+>;
 export type LoginBodyType = z.infer<typeof LoginBodySchema>;
 export type LoginResType = z.infer<typeof LoginResSchema>;
-export type RefreshTokenType = z.infer<typeof RefreshTokenSchema>;
-export type RefreshTokenBodyType = z.infer<typeof RefreshTokenBodySchema>;
+export type RefreshTokenType = z.infer<
+  typeof RefreshTokenSchema
+>;
+export type RefreshTokenBodyType = z.infer<
+  typeof RefreshTokenBodySchema
+>;
 export type RefreshTokenResType = LoginResType;
 export type DeviceType = z.infer<typeof DeviceSchema>;
 export type RoleType = z.infer<typeof RoleSchema>;
 export type LogoutBodyType = RefreshTokenBodyType;
+export type GoogleAuthStateType = z.infer<
+  typeof GoogleAuthStateSchema
+>;
+export type GetAuthorizationUrlResType = z.infer<
+  typeof GetAuthorizationUrlResSchema
+>;
